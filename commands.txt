@@ -1,0 +1,7 @@
+option cplex_options 'presolve=0 cliques=-1 mipcuts=-1 splitcuts=-1 heuristicfreq=-1 time=120 display=0 timing=1 mipdisplay=5 mipinterval=1 mipsearch=1';
+solve;
+
+display D, bud, y;
+
+
+
