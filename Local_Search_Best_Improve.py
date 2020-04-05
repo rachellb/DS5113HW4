@@ -124,7 +124,7 @@ while done == 0:
             x_best = s[:]                 #find the best member and keep track of that solution
             f_best = evaluate(s)[:]       #and store its evaluation  
     
-    if f_best == f_curr:               #if there were no improving solutions in the neighborhood
+    if f_best == f_curr:                  #if there were no improving solutions in the neighborhood
         done = 1
     else:
         

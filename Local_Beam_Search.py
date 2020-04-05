@@ -73,6 +73,7 @@ def evaluate(x):
        
 #here is a simple function to create a neighborhood
 #1-flip neighborhood of solution x         
+
 def neighborhood(x):
         
     nbrhood = []     
@@ -107,19 +108,21 @@ def initial_solution():
 #varaible to record the number of solutions evaluated
 solutionsChecked = 0
 
-para = []       # A list to store the best solutions for each search
+
+BestsDict = {}  # A Dictionary to store solutions and it's corresponding value/weight
 
 for i in range(0,searches):         # This will store a number of initial solutions 
-    para.append(initial_solution()) # equal to number of neighborhoods to seach in parallel
+    x_curr = initial_solution() # equal to number of neighborhoods to seach in parallel
+    f_curr = evaluate(i)[:]
+    BestsDict.update( {x_curr : f_curr} ) # Stores solution and it's value/weight
+              
+x_best = initial_solution()     # Generates an initial best solution
+f_best = evaluate(x_best)       # Evaluates that initial best solution
     
-x_best = para[0]                    # Initializes best solution
-f_curr = evaluate(x_best)          
-f_best = f_curr[:]                  
-
-for i in range(0, len(para)):       # This loop just finds the best of these neighborhoods
-    if evaluate(i)[0] > f_best[0]:
-        x_best = i[:]
-        f_best = evaluate(i)[:]
+for key in BestsDict:       # This loop just finds the best of these neighborhoods
+    if BestsDict[key][0] > f_best[0]:  # Should check if the best value in the dictionary is better than the current best
+        x_bestB = key
+        f_bestB = BestsDict[key][:]
 
 
 #begin local search overall logic ----------------
@@ -127,16 +130,25 @@ done = 0
     
 while done == 0:
      
-    for i in range(0,len(para)):         # This should make k neighborhoods and run through them all
-        Neighborhood = neighborhood(i)   #create a list of all neighbors in the neighborhood of i
+    for key in BestsDict:                  # This should make k neighborhoods and run through them all
+        Neighborhood = neighborhood(key)   # create a list of all neighbors in the neighborhood of key
     
         for s in Neighborhood:                #evaluate every member in the neighborhood of x_curr
             solutionsChecked = solutionsChecked + 1
-            if evaluate(s)[0] > f_best[0]:   
-                para[i] = s[:]                #find the best member and keep track of that solution
-                f_best = evaluate(s)[:]       #and store its evaluation  
-    
-    if f_best == f_curr:               #if there were no improving solutions in the neighborhood
+            if evaluate(s)[0] > f_best[0]:  
+                newkey = s
+                f_best = evaluate(key)[:]
+                
+        if f_best == 
+        del BestsDict[key]                  # I think this removes the current key value pair
+        BestsDict.update({newkey: f_best})  # Adds the best key value pair from the neighborhood search
+       
+    for key in BestsDict:       # This loop just finds the best of these neighborhoods
+        if BestsDict[key][0] > f_best[0]:  # Should check if the best value in the dictionary is better than the current best
+            x_curr = key
+            f_best = BestsDict[key][:]    
+        
+    if f_best == f_bestB:               #if there were no improving solutions in the neighborhood
         done = 1
     else:
         
