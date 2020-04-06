@@ -1,6 +1,10 @@
 \documentclass[12pt, letterpaper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{mathtools}		% For piecewise functions
+
+
 
 \titleformat*{\section}{\normalsize\bfseries}
 \titleformat*{\subsection}{\small\bfseries}
@@ -20,12 +24,78 @@
 
 \section*{Question 1}
 \subsection*{(a)}
+The facility location problem consisted of a set of $I$ districts that needed to be served by firehouses in possible sites $J$. 
+Our formulation uses:
+
+\[
+  y_j =
+  \begin{cases}
+                                   1 & \text{if site $j$ is selected} \\
+                                   0 & \text{otherwise} \\
+  \end{cases}
+\]
+
+
+\[
+  x_{ij} =
+  \begin{cases}
+                                   1 & \text{if district $i$ is assigned to site $j$} \\
+                                   0 & \text{otherwise} \\
+  \end{cases}
+\]
+
+Each district should be assigned to exactly one firehouse.
+
+$$ \sum_{j=1}^{J} x_{ij} = 1 \text{   ($i$ = 1, 2, ..., $I$)}$$
+
+No district should be assigned to an "unused" site.
+
+$$ \sum_{i=1}^{I} x_{ij} \leq y_{j}I \text{   ($j$ = 1, 2, ..., $J$)}$$
+
+It is important that either at least sites 1 and 2 or sites 3 and 4 are selected. This is done through another binary variable $z$.
+
+$$y_1 + y_2 \geq 2z$$
+
+$$\text{or}$$
+
+$$y_3 + y_4 \geq 2(1-z)$$
+
+A new variable was created for each site to denote the population that would be serviced.
+
+$$s_j = \sum_{i=1}^{I} p_{i}x_{ij}$$
+
+Where $p_i$ was the population in each district. 
+
+The total costs of servicing each site plus the cost of building each firehouse needed to stay under a given budget. 
+
+$$ \sum_{j=1}^{J} (c_{j}s_{j} + f_{j}y_{j}) \leq B$$
+
+Where $c_j$ is the cost of service in each district and $f_j$ is the fixed cost of building a firehouse.
+
+The objective was to minimize the "worst-case" distances between each district center and its assigned firehouse. This was done through the creation of a variable $D$, which was set to be greater than all distances for each district $i$. 
+
+$$ D \geq \sum_{j=1}^{J} d_{ij}x_{ij} \text{  ($i$ = 1,2,...,$I$)}$$
+
+
+See attached AMPL file for code. 
+
+
 \subsection*{(b)}
 \subsubsection*{(i)}
 The optimal solution had a worst-case distance of 31.3, using \$14,988,200 to build the firehouses and service the districts. The total 
 solution time was 3.31732 seconds, with 4821 nodes explored. The root relaxation value was 6.1359. The first incumbent solution of 135.8 was found at node 121. 
 \subsubsection*{(ii)}
+
+\begin{center}
+\includegraphics[scale=1]{B&B_performance}
+\end{center}
+
+As several thousand nodes were explored, the graph's x-axis was indexed at intervals of 250 nodes to reduce the size of the graph.
+
 \subsubsection*{(iii)}
+
+The solution time was increased slightly to 3.42617 seconds, and the enumeration tree was greatly reduced to 2706 nodes. however, the objective value stayed at 31.3, while the budget decreased to \$14,968,700.
+
 \section*{Question 2}
 
 \subsection*{(a)}
@@ -56,6 +126,8 @@ The random walk variation of local search used the first improvement method in o
 
 \section*{Question 7}
 
+Local Beam Search was implemented with 3 neighborhoods running at the same time using best improvement. 
+
 \begin{center}
 \begin{tabular}{ l r r r r } 
 
@@ -67,7 +139,7 @@ Local Search (Best Improvement) & 7050 & 28 & 1499.6 & 14170.60 \\
 Local Search (First Improvement) & 3055 & 16 & 1497.1 & 6391.79\\
 Local Search (Random Restarts) & 71400 & 31 & 1494.6 & 15218.80\\
 Local Search (Random Walk) & 6635 & 19 & 1495.1 & 7801.60\\
-Local Beam Search & & & & place\\
+Local Beam Search & 12600 & 26 & 1499.3 & 11866.50\\
  \hline
 \end{tabular}
 \end{center}

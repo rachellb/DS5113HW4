@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 
 #basic hill climbing search provided as base code for the DSA/ISE 5113 course
@@ -53,7 +54,7 @@ solutionsChecked = 0
 penalty = max(weights)                # To penalize the solutions with total weight over the max weight 
  
 
-searches = 3    # Number of parellel searches that will occur
+searches = 3
 
 #function to evaluate a solution x
 def evaluate(x):
@@ -73,7 +74,6 @@ def evaluate(x):
        
 #here is a simple function to create a neighborhood
 #1-flip neighborhood of solution x         
-
 def neighborhood(x):
         
     nbrhood = []     
@@ -104,62 +104,68 @@ def initial_solution():
 
 
 
-
 #varaible to record the number of solutions evaluated
 solutionsChecked = 0
 
+x_curr = []         # A list that stores the current solutions of each neighborhood
+x_best = []         # This will store the best solution of each neighborhood
+f_curr = []         # This stores the current evaluation of the current solution
+f_best = []         # Stores the best values of each neighborhood
 
-BestsDict = {}  # A Dictionary to store solutions and it's corresponding value/weight
 
-for i in range(0,searches):         # This will store a number of initial solutions 
-    x_curr = initial_solution() # equal to number of neighborhoods to seach in parallel
-    f_curr = evaluate(i)[:]
-    BestsDict.update( {x_curr : f_curr} ) # Stores solution and it's value/weight
-              
-x_best = initial_solution()     # Generates an initial best solution
-f_best = evaluate(x_best)       # Evaluates that initial best solution
+for i in range(0,searches):
+    x_curr.append(initial_solution())         # this makes k current solutions
+    x_best.append(x_curr[i][:])               # This will hold the best in this neighborhood
+    f_curr.append(evaluate(x_best[i]))           # This will hold the evaluation of the current solution of this neighborhood
+    f_best.append(f_curr[i][:])               # This will hold the best of this neighborhood
     
-for key in BestsDict:       # This loop just finds the best of these neighborhoods
-    if BestsDict[key][0] > f_best[0]:  # Should check if the best value in the dictionary is better than the current best
-        x_bestB = key
-        f_bestB = BestsDict[key][:]
+x_bestB = initial_solution()        # This will store the best of the best of the neighborhoods
+f_bestB = evaluate(x_bestB)[:]      # This stores the weight and value of the best of the best solution
+
+for i in range(0,len(x_curr)-1):
+    if evaluate(x_curr[i])[0] > f_bestB[0]:
+        x_bestB = x_curr[i][:]              # This is best solution in all neighborhoods
+        f_bestB = evaluate(x_curr[i])[:]    # Stores the value for this best of best solution
+        
+# By the end of this we have an array of k solutions that will make the neighborhoods
 
 
 #begin local search overall logic ----------------
+
 done = 0
-    
+
+
 while done == 0:
-     
-    for key in BestsDict:                  # This should make k neighborhoods and run through them all
-        Neighborhood = neighborhood(key)   # create a list of all neighbors in the neighborhood of key
+            
+    for i in range(0,len(x_curr)-1):
+        
+        Neighborhood = neighborhood(x_curr[i])   #create a list of all neighbors in the neighborhood of x_curr
     
         for s in Neighborhood:                #evaluate every member in the neighborhood of x_curr
             solutionsChecked = solutionsChecked + 1
-            if evaluate(s)[0] > f_best[0]:  
-                newkey = s
-                f_best = evaluate(key)[:]
-                
-        if f_best == 
-        del BestsDict[key]                  # I think this removes the current key value pair
-        BestsDict.update({newkey: f_best})  # Adds the best key value pair from the neighborhood search
-       
-    for key in BestsDict:       # This loop just finds the best of these neighborhoods
-        if BestsDict[key][0] > f_best[0]:  # Should check if the best value in the dictionary is better than the current best
-            x_curr = key
-            f_best = BestsDict[key][:]    
+            if evaluate(s)[0] > f_best[i][0]:   
+                x_best[i] = s[:]                 #find the best member and keep track of that solution
+                f_best[i] = evaluate(s)[:]       #and store its evaluation 
+    
+    for i in range(0,len(x_best)-1):                          # this finds the best of the best of the neighborhoods
+        if evaluate(x_best[i])[0] > f_bestB[0]:
+            x_bestB = x_best[i][:]
+            f_bestB = evaluate(x_best[i])[:]
         
-    if f_best == f_bestB:               #if there were no improving solutions in the neighborhood
-        done = 1
+    for i in range(0,len(f_curr)-1): 
+        if f_bestB == f_curr[i]:                  #if there were no improving solutions in the neighborhood
+            done = 1
+            
     else:
-        
-        x_curr = x_best[:]         #else: move to the neighbor solution and continue
-        f_curr = f_best[:]         #evalute the current solution
+        for i in range(0,len(x_curr)-1):
+            x_curr[i] = x_best[i][:]        #else: move to the neighbor solution and continue
+            f_curr[i] = f_best[i][:]         #evalute the current solution
         
         print ("\nTotal number of solutions checked: ", solutionsChecked)
-        print ("Best value found so far: ", f_best)        
+        print ("Best value found so far: ", f_bestB)        
     
 print ("\nFinal number of solutions checked: ", solutionsChecked)
-print ("Best value found: ", f_best[0])
-print ("Weight is: ", f_best[1])
-print ("Total number of items selected: ", np.sum(x_best))
-print ("Best solution: ", x_best)
+print ("Best value found: ", f_bestB[0])
+print ("Weight is: ", f_bestB[1])
+print ("Total number of items selected: ", np.sum(x_bestB))
+print ("Best solution: ", x_bestB)
